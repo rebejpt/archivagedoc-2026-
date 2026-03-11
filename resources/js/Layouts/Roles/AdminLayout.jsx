@@ -45,7 +45,7 @@ export default function AdminLayout({ children }) {
     // Navigation principale (visible pour admin)
     const mainNav = [
         {
-            name: "Tableau de bord",
+            name: "Dashboard",
             href: "/dashboard",
             icon: Home,
             color: "blue",
@@ -223,7 +223,7 @@ export default function AdminLayout({ children }) {
                                 }`}
                             >
                                 <div
-                                    className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${item.color}-100 text-${item.color}-600 dark:bg-${item.color}-900 dark:text-${item.color}-400`}
+                                    className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${item.color}-100  text-${item.color}-600 dark: text-${item.color}-200 dark:text-${item.color}-800`}
                                 >
                                     <item.icon size={18} />
                                 </div>
@@ -250,7 +250,7 @@ export default function AdminLayout({ children }) {
                                         className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                     >
                                         <div
-                                            className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${item.color}-100 text-${item.color}-600 dark:bg-${item.color}-900 dark:text-${item.color}-400`}
+                                            className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${item.color}-100  text-${item.color}-600 dark: text-${item.color}-200 dark:text-${item.color}-800`}
                                         >
                                             <item.icon size={18} />
                                         </div>
@@ -265,7 +265,7 @@ export default function AdminLayout({ children }) {
 
                     {/* Favoris */}
                     {sidebarOpen && (
-                        <>
+                        <div>
                             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-3">
                                 Favoris
                             </h2>
@@ -278,18 +278,15 @@ export default function AdminLayout({ children }) {
                                     >
                                         <item.icon
                                             size={16}
-                                            className="mr-3 text-gray-400"
+                                            className="mr-3 text-yellow-500"
                                         />
                                         <span className="flex-1">
                                             {item.name}
                                         </span>
-                                        <span className="text-xs text-gray-400">
-                                            {item.count}
-                                        </span>
                                     </Link>
                                 ))}
                             </div>
-                        </>
+                        </div>
                     )}
                 </div>
 

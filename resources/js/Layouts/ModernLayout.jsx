@@ -78,29 +78,39 @@ export default function ModernLayout({ children }) {
 
     // Navigation principale - ADMIN VOIT TOUT
     const mainNavigation = [
-        { name: "Tableau de bord", href: "/dashboard", icon: Home, show: true },
+        {
+            name: "Dashboard",
+            href: "/dashboard",
+            icon: Home,
+            color: "blue",
+            show: true,
+        },
         {
             name: "Tous les documents",
             href: "/documents",
             icon: FileText,
+            color: "green",
             show: true,
         },
         {
             name: "Upload",
             href: "/documents/upload",
             icon: Upload,
+            color: "purple",
             show: isAdmin ? true : can.uploadDocuments,
         },
         {
             name: "Catégories",
             href: "/categories",
             icon: FolderTree,
+            color: "orange",
             show: isAdmin ? true : can.viewCategories,
         },
         {
             name: "Tags",
             href: "/tags",
             icon: Tags,
+            color: "pink",
             show: isAdmin ? true : can.viewTags,
         },
     ].filter((w) => w.show);
@@ -111,24 +121,28 @@ export default function ModernLayout({ children }) {
             name: "Documents récents",
             href: "/documents?sort=recent",
             icon: Clock,
+            color: "blue",
             show: true,
         },
         {
             name: "Les plus consultés",
             href: "/documents?sort=views",
             icon: Eye,
+            color: "green",
             show: true,
         },
         {
             name: "Les plus téléchargés",
             href: "/documents?sort=downloads",
             icon: Download,
+            color: "purple",
             show: true,
         },
         {
             name: "En attente de validation",
             href: "/documents?filter=pending",
             icon: Filter,
+            color: "orange",
             show: isAdmin ? true : can.uploadDocuments,
         },
     ].filter((f) => f.show);
@@ -139,24 +153,28 @@ export default function ModernLayout({ children }) {
             name: "Utilisateurs",
             href: "/users",
             icon: Users,
+            color: "red",
             show: isAdmin ? true : can.viewUsers,
         },
         {
             name: "Historique",
             href: "/access-logs",
             icon: History,
+            color: "gray",
             show: isAdmin ? true : can.viewLogs,
         },
         {
             name: "Statistiques",
             href: "/stats",
             icon: BarChart3,
+            color: "blue",
             show: isAdmin ? true : can.viewStats,
         },
         {
             name: "Paramètres",
             href: "/settings",
             icon: Settings,
+            color: "slate",
             show: isAdmin ? true : can.manageUsers,
         },
     ].filter((l) => l.show);
@@ -219,9 +237,11 @@ export default function ModernLayout({ children }) {
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                                 <FileText size={18} className="text-white" />
                             </div>
-                            <span className="font-bold text-lg">Archidoc</span>
+                            <span className="font-bold text-lg dark:text-white">
+                                Archidoc
+                            </span>
                             {isAdmin && (
-                                <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+                                <span className="text-xs bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400 px-2 py-0.5 rounded-full">
                                     Admin
                                 </span>
                             )}
@@ -233,9 +253,12 @@ export default function ModernLayout({ children }) {
                     )}
                     <button
                         onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="p-1 hover:bg-gray-100 rounded-lg"
+                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                     >
-                        <Menu size={18} className="text-gray-500" />
+                        <Menu
+                            size={18}
+                            className="text-gray-500 dark:text-gray-400"
+                        />
                     </button>
                 </div>
 
@@ -246,12 +269,12 @@ export default function ModernLayout({ children }) {
                             Mes dossiers
                         </h2>
                         <div className="space-y-2">
-                            <div className="bg-gray-50 rounded-lg p-3">
+                            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                                 <div className="flex items-center justify-between text-sm mb-2">
-                                    <span className="font-medium text-gray-700">
+                                    <span className="font-medium text-gray-700 dark:text-gray-200">
                                         Documents
                                     </span>
-                                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                                    <span className="text-xs bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300 px-2 py-1 rounded-full">
                                         {documentFolders.reduce(
                                             (acc, f) => acc + f.items,
                                             0,
@@ -265,10 +288,10 @@ export default function ModernLayout({ children }) {
                                             key={idx}
                                             className="flex items-center justify-between text-xs pl-2"
                                         >
-                                            <span className="text-gray-600">
+                                            <span className="text-gray-600 dark:text-gray-300">
                                                 {folder.name}
                                             </span>
-                                            <span className="text-gray-400">
+                                            <span className="text-gray-400 dark:text-gray-500">
                                                 {folder.items} docs
                                             </span>
                                         </div>
@@ -291,15 +314,17 @@ export default function ModernLayout({ children }) {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors group ${
+                                className={`flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group ${
                                     sidebarOpen ? "" : "justify-center"
                                 }`}
                             >
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 text-gray-600">
+                                <div
+                                    className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${item.color}-100 text-${item.color}-600 dark:bg-${item.color}-900/30 dark:text-${item.color}-400`}
+                                >
                                     <item.icon size={18} />
                                 </div>
                                 {sidebarOpen && (
-                                    <span className="ml-3 text-sm font-medium text-gray-700">
+                                    <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-200">
                                         {item.name}
                                     </span>
                                 )}
@@ -318,12 +343,13 @@ export default function ModernLayout({ children }) {
                                     <Link
                                         key={idx}
                                         href={item.href}
-                                        className="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                        className="flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                                     >
-                                        <item.icon
-                                            size={16}
-                                            className="mr-3 text-gray-400"
-                                        />
+                                        <div
+                                            className={`w-6 h-6 rounded-lg flex items-center justify-center mr-3 bg-${item.color}-100 text-${item.color}-600 dark:bg-${item.color}-900/30 dark:text-${item.color}-400`}
+                                        >
+                                            <item.icon size={14} />
+                                        </div>
                                         {item.name}
                                     </Link>
                                 ))}
@@ -342,12 +368,14 @@ export default function ModernLayout({ children }) {
                                     <Link
                                         key={item.name}
                                         href={item.href}
-                                        className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                                        className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                     >
-                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 text-gray-600">
+                                        <div
+                                            className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${item.color}-100 text-${item.color}-600 dark:bg-${item.color}-900/30 dark:text-${item.color}-400`}
+                                        >
                                             <item.icon size={18} />
                                         </div>
-                                        <span className="ml-3 text-sm font-medium text-gray-700">
+                                        <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-200">
                                             {item.name}
                                         </span>
                                     </Link>
@@ -434,17 +462,17 @@ export default function ModernLayout({ children }) {
                                 placeholder="Rechercher un document par mot-clé, catégorie, auteur..."
                                 value={searchQuery}
                                 onChange={handleSearch}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
 
                             {/* Résultats de recherche */}
                             {showSearchResults && searchResults.length > 0 && (
-                                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50">
+                                <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto z-50">
                                     {searchResults.map((doc) => (
                                         <Link
                                             key={doc.id}
                                             href={`/documents/${doc.id}`}
-                                            className="flex items-center px-4 py-3 hover:bg-gray-50 border-b last:border-b-0"
+                                            className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b last:border-b-0 dark:border-gray-700"
                                             onClick={() =>
                                                 setShowSearchResults(false)
                                             }
@@ -454,10 +482,10 @@ export default function ModernLayout({ children }) {
                                                 className="mr-3 text-gray-400"
                                             />
                                             <div>
-                                                <p className="text-sm font-medium text-gray-800">
+                                                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
                                                     {doc.title}
                                                 </p>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
                                                     {doc.category?.name} •{" "}
                                                     {new Date(
                                                         doc.created_at,

@@ -11,10 +11,15 @@ const axiosInstance = axios.create({
 
 // Intercepteur pour ajouter le token CSRF
 axiosInstance.interceptors.request.use((config) => {
-    const token = document.querySelector('meta[name="csrf-token"]');
-    if (token) {
-        config.headers["X-CSRF-TOKEN"] = token.getAttribute("content");
+    // Récupérer le token CSRF depuis le meta tag
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute("content");
+
+    if (csrfToken) {
+        config.headers["X-CSRF-TOKEN"] = csrfToken;
     }
+
     return config;
 });
 

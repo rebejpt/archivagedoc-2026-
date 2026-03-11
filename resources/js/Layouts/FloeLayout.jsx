@@ -180,22 +180,21 @@ export default function FloeLayout({ children }) {
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors group ${
+                                className={`flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group ${
                                     sidebarOpen ? "" : "justify-center"
                                 }`}
                             >
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 text-gray-600">
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
                                     <item.icon size={18} />
                                 </div>
                                 {sidebarOpen && (
-                                    <span className="ml-3 text-sm font-medium text-gray-700">
+                                    <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-200">
                                         {item.name}
                                     </span>
                                 )}
                             </Link>
                         ))}
                     </nav>
-
                     {/* Administration (admin only) */}
                     {adminLinks.length > 0 && sidebarOpen && (
                         <>
@@ -207,12 +206,12 @@ export default function FloeLayout({ children }) {
                                     <Link
                                         key={item.name}
                                         href={item.href}
-                                        className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                                        className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                     >
-                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 text-gray-600">
+                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400">
                                             <item.icon size={18} />
                                         </div>
-                                        <span className="ml-3 text-sm font-medium text-gray-700">
+                                        <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-200">
                                             {item.name}
                                         </span>
                                     </Link>
@@ -220,10 +219,9 @@ export default function FloeLayout({ children }) {
                             </nav>
                         </>
                     )}
-
                     {/* Favourites */}
                     {sidebarOpen && favourites.length > 0 && (
-                        <>
+                        <div>
                             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-3">
                                 Favourites
                             </h2>
@@ -232,18 +230,14 @@ export default function FloeLayout({ children }) {
                                     <Link
                                         key={idx}
                                         href={item.href}
-                                        className="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                                    >
-                                        <Star
-                                            size={16}
-                                            className="mr-3 text-gray-400"
-                                        />
-                                        {item.name}
-                                    </Link>
+                                        className="flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                                    ></Link>
                                 ))}
+                                ;
                             </div>
-                        </>
+                        </div>
                     )}
+                    ;
                 </div>
 
                 {/* User Profile */}

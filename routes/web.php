@@ -17,18 +17,12 @@ Route::get('/', function () {
 
 // Route pour le formulaire de demande d'accès
 Route::post('/access-request', function (Request $request) {
-    // Valider la demande
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'company' => 'required|string|max:255',
         'reason' => 'required|string'
     ]);
-    
-    //  TODO: Envoyer un email à l'administrateur
-    // Mail::to('admin@archidoc.com')->send(new AccessRequestMail($request->all()));
-    
-    // TODO: Stocker la demande en base de données si nécessaire
     
     return response()->json(['message' => 'Demande envoyée avec succès']);
 })->name('access.request');
@@ -88,7 +82,8 @@ Route::middleware(['auth'])->group(function () {
             return Inertia::render('Tags/Edit', ['id' => $id]);
         })->name('edit');
     });
-        // ROUTES PROFIL - AJOUTE ÇA !
+    
+    // Routes Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -113,26 +108,34 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/documents/{id}', function ($id) {
             return Inertia::render('Documents/Show', ['id' => $id]);
-        })->name('documents.show');     
+        })->name('documents.show');
+        
+        // Route stats accessible aux admins
+        Route::get('/stats', function () {
+            return Inertia::render('Stats/Index');
+        })->name('stats.index');
     });
     
-    // Routes utilisateurs (accès direct depuis le sidebar)
-    Route::middleware(['role:admin'])->group(function () {
-        Route::get('/users', function () {
-            return Inertia::render('Users/Index');
-        });
-        
-        Route::get('/users/create', function () {
-            return Inertia::render('Users/Create');
-        });
-        
-        Route::get('/users/{id}/edit', function ($id) {
-            return Inertia::render('Users/Edit', ['id' => $id]);
-        });
-    });
+    // Routes accessibles depuis le sidebar (admin only)
+    Route::middleware(['auth'])->get('/users', function () {
+        // Rediriger vers admin.users si admin
+        return Inertia::render('Users/Index');
+    })->name('users.index');
+    
+    Route::middleware(['auth'])->get('/access-logs', function () {
+        return Inertia::render('AccessLogs/Index');
+    })->name('access-logs');
+    
+    Route::middleware(['auth'])->get('/stats', function () {
+        return Inertia::render('Stats/Index');
+    })->name('stats');
+    
+    Route::middleware(['auth'])->get('/settings', function () {
+        return Inertia::render('Settings/Index');
+    })->name('settings');
 });
 
-// Routes API-like via web (protégées par session)
+// Routes API-like via web (protégées par session CSRF)
 Route::middleware(['auth'])->prefix('web-api')->name('api.')->group(function () {
     // Statistiques
     Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
@@ -143,13 +146,9 @@ Route::middleware(['auth'])->prefix('web-api')->name('api.')->group(function () 
         Route::post('/', [DocumentController::class, 'store'])->name('store');
         Route::get('/{document}', [DocumentController::class, 'show'])->name('show');
         Route::put('/{document}', [DocumentController::class, 'update'])->name('update');
-        // Route::delete('/{document}', [DocumentController::class, 'destroy'])->name('destroy');
+        Route::delete('/{document}', [DocumentController::class, 'destroy'])->name('destroy');
         Route::get('/{document}/download', [DocumentController::class, 'download'])->name('download');
-        // Route::get('/documents/{id}/edit',  [DocumentController::class, 'edit'])->name('edit');
-        // modofication
-        // Route::get('/upload', [DocumentController::class, 'create'])->name('upload');
         Route::get('/{id}/edit', [DocumentController::class, 'edit'])->name('edit');
-        // pour le afficher le details du document - historiques
         Route::get('/{document}/history', [DocumentController::class, 'history']);
     });
     
@@ -170,19 +169,18 @@ Route::middleware(['auth'])->prefix('web-api')->name('api.')->group(function () 
         Route::get('/{tag}', [TagController::class, 'show'])->name('show');
         Route::put('/{tag}', [TagController::class, 'update'])->name('update');
         Route::delete('/{tag}', [TagController::class, 'destroy'])->name('destroy');
-       
     });
     
     // Utilisateurs (admin seulement)
     Route::middleware(['role:admin'])->prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'index']);
-        Route::get('/list', [UserController::class, 'list']);//ADD
+        Route::get('/list', [UserController::class, 'list']);
         Route::post('/', [UserController::class, 'store']);
         Route::get('/{user}', [UserController::class, 'show']);
         Route::put('/{user}', [UserController::class, 'update']);
         Route::delete('/{user}', [UserController::class, 'destroy']);
-        Route::patch('/{user}/toggle-active', [UserController::class, 'toggleActive']);//ADD
-        Route::patch('/roles', [UserController::class, 'roles']);//ADD
+        Route::patch('/{user}/toggle-active', [UserController::class, 'toggleActive']);
+        Route::patch('/roles', [UserController::class, 'roles']);
     });
     
     // Route pour récupérer les rôles (GET)
@@ -190,5 +188,5 @@ Route::middleware(['auth'])->prefix('web-api')->name('api.')->group(function () 
 });
 
 // Routes d'authentification (Breeze)
-// Route pour le changement de mot de passe (dans auth.php)
 require __DIR__.'/auth.php';
+

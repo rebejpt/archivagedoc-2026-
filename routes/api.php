@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/documents/{document}', [DocumentController::class, 'update']);
     Route::delete('/documents/{document}', [DocumentController::class, 'destroy']);
     Route::get('/documents/{document}/download', [DocumentController::class, 'download']);
+    Route::get('/documents/{document}/edit', [DocumentController::class, 'edit']);
+    Route::get('/documents/{document}/history', [DocumentController::class, 'history']);
     
     // Catégories
     Route::get('/categories', [CategoryController::class, 'index']);
@@ -32,7 +34,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/tags/{tag}', [TagController::class, 'show']);
     Route::put('/tags/{tag}', [TagController::class, 'update']);
     Route::delete('/tags/{tag}', [TagController::class, 'destroy']);
-    Route::get('/popular-tags', [TagController::class, 'popular']);
+    Route::get('/tags/popular', [TagController::class, 'popular']);
+    
+    // Users (admin seulement)
+    Route::get('/users', [UserController::class, 'index']);
+    Route::post('/users', [UserController::class, 'store']);
+    Route::get('/users/{user}', [UserController::class, 'show']);
+    Route::put('/users/{user}', [UserController::class, 'update']);
+    Route::delete('/users/{user}', [UserController::class, 'destroy']);
+    Route::patch('/users/{user}/toggle-active', [UserController::class, 'toggleActive']);
+    Route::patch('/users/roles', [UserController::class, 'roles']);
     
     // Users - Rôles (pour les formulaires)
     Route::get('/roles', [UserController::class, 'roles']);
