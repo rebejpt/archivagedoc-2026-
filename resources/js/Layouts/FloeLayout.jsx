@@ -48,29 +48,49 @@ export default function FloeLayout({ children }) {
 
     // Workflows (liens principaux)
     const workflows = [
-        { name: "Dashboard", href: "/dashboard", icon: Home, show: true },
-        { name: "Documents", href: "/documents", icon: FileText, show: true },
+        {
+            name: "Dashboard",
+            href: "/dashboard",
+            icon: Home,
+            color: "blue",
+            show: true,
+        },
+        {
+            name: "Documents",
+            href: "/documents",
+            icon: FileText,
+            color: "green",
+            show: true,
+        },
         {
             name: "Upload",
             href: "/documents/upload",
             icon: Upload,
+            color: "purple",
             show: can.uploadDocuments,
         },
         {
             name: "Catégories",
             href: "/categories",
             icon: FolderTree,
+            color: "orange",
             show: can.viewCategories,
         },
-        { name: "Tags", href: "/tags", icon: Tags, show: can.viewTags },
+        {
+            name: "Tags",
+            href: "/tags",
+            icon: Tags,
+            color: "pink",
+            show: can.viewTags,
+        },
     ].filter((w) => w.show);
 
     // Favoris
     const favourites = [
-        { name: "Email Responder", href: "#", show: true },
-        { name: "Budgeting", href: "#", show: true },
-        { name: "Mental Health Track...", href: "#", show: true },
-        { name: "Client Onboarding", href: "#", show: can.manageUsers },
+        { name: "Email Responder", href: "#", show: false },
+        { name: "Budgeting", href: "#", show: false },
+        { name: "Mental Health Track...", href: "#", show: false },
+        { name: "Client Onboarding", href: "#", show: false },
     ].filter((f) => f.show);
 
     // Administration
@@ -79,24 +99,36 @@ export default function FloeLayout({ children }) {
             name: "Utilisateurs",
             href: "/users",
             icon: Users,
+            color: "red",
             show: can.viewUsers,
+        },
+        // demande d'acces
+        {
+        name: "Demandes d'accès", 
+        href: "/admin/access-requests",
+        icon: Inbox, 
+        color:"green",
+        show: can?.manageUsers,
         },
         {
             name: "Historique",
             href: "/access-logs",
             icon: History,
+            color: "gray",
             show: can.viewLogs,
         },
         {
             name: "Statistiques",
             href: "/stats",
             icon: BarChart3,
+            color: "blue",
             show: can.viewStats,
         },
         {
             name: "Paramètres",
             href: "/settings",
             icon: Settings,
+            color: "slate",
             show: can.manageUsers,
         },
     ].filter((l) => l.show);
@@ -184,7 +216,9 @@ export default function FloeLayout({ children }) {
                                     sidebarOpen ? "" : "justify-center"
                                 }`}
                             >
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400">
+                                <div
+                                    className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${item.color}-100  text-${item.color}-600 dark: text-${item.color}-200 dark:text-${item.color}-800`}
+                                >
                                     <item.icon size={18} />
                                 </div>
                                 {sidebarOpen && (
@@ -208,7 +242,9 @@ export default function FloeLayout({ children }) {
                                         href={item.href}
                                         className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                     >
-                                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400">
+                                        <div
+                                            className={`w-8 h-8 rounded-lg flex items-center justify-center bg-${item.color}-100  text-${item.color}-600 dark: text-${item.color}-200 dark:text-${item.color}-800`}
+                                        >
                                             <item.icon size={18} />
                                         </div>
                                         <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -222,9 +258,7 @@ export default function FloeLayout({ children }) {
                     {/* Favourites */}
                     {sidebarOpen && favourites.length > 0 && (
                         <div>
-                            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-3">
-                                Favourites
-                            </h2>
+                            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-3"></h2>
                             <div className="space-y-2">
                                 {favourites.map((item, idx) => (
                                     <Link
@@ -233,11 +267,9 @@ export default function FloeLayout({ children }) {
                                         className="flex items-center px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                                     ></Link>
                                 ))}
-                                ;
                             </div>
                         </div>
                     )}
-                    ;
                 </div>
 
                 {/* User Profile */}
@@ -276,14 +308,7 @@ export default function FloeLayout({ children }) {
                                 >
                                     Mon profil
                                 </Link>
-                                {can.manageUsers && (
-                                    <Link
-                                        href="/settings"
-                                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                                    >
-                                        Paramètres
-                                    </Link>
-                                )}
+
                                 <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                                 {/* Version corrigée avec Inertia */}
                                 <button

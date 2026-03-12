@@ -6,6 +6,7 @@ import { usePermissions } from "@/Hooks/usePermissions";
 import axios from "@/Services/axios";
 import DocumentInfo from "./Partials/DocumentInfo";
 import DocumentTags from "./Partials/DocumentTags";
+import DocumentPreview from "./Partials/DocumentPreview";
 import DocumentHistory from "./Partials/DocumentHistory";
 import { ArrowLeft, Download, Edit, Trash2 } from "lucide-react";
 
@@ -36,7 +37,6 @@ export default function DocumentShow({ id }) {
             const response = await axios.get(
                 `/web-api/documents/${id}/download`,
             );
-            // Rediriger vers l'URL de téléchargement
             window.open(response.data.download_url, "_blank");
         } catch (err) {
             console.error("Erreur téléchargement:", err);
@@ -51,7 +51,6 @@ export default function DocumentShow({ id }) {
 
         try {
             await axios.delete(`/web-api/documents/${id}`);
-            // Rediriger vers la liste
             window.location.href = "/documents";
         } catch (err) {
             console.error("Erreur suppression:", err);
@@ -87,7 +86,6 @@ export default function DocumentShow({ id }) {
         );
     }
 
-    // Vérifier si l'utilisateur peut modifier ce document
     const canEdit =
         isAdmin ||
         (isContributor && document.user_id === usePage().props.auth.user?.id);
@@ -103,61 +101,53 @@ export default function DocumentShow({ id }) {
                     >
                         <ArrowLeft size={20} className="text-gray-600" />
                     </Link>
-                    <h1 className="text-2xl font-bold text-gray-800">
-                        Détail du document
-                    </h1>
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-800">
+                            {document.title}
+                        </h1>
+                        <p className="text-sm text-gray-500 mt-1">
+                            {document.category?.name} •{" "}
+                            {document.file_type?.toUpperCase()} •{" "}
+                            {document.file_size_formatted}
+                        </p>
+                    </div>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                    {/* Bouton Télécharger */}
                     <button
                         onClick={handleDownload}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center shadow-sm hover:shadow transition-all"
                     >
                         <Download size={18} className="mr-2" />
                         Télécharger
                     </button>
 
-                    {/* Bouton Modifier (si autorisé) */}
                     {canEdit && (
                         <Link
                             href={`/documents/${id}/edit`}
-                            className="px-4 py-2 bg-red-600 text-white flex items-center"
+                            className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center shadow-sm hover:shadow transition-all"
                         >
                             <Edit size={18} className="mr-2" />
                             Modifier
                         </Link>
                     )}
-
-                    {/* Bouton Supprimer (si admin) */}
-                    {/* {isAdmin && (
-                        <button
-                            onClick={handleDelete}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center"
-                        >
-                            <Trash2 size={18} className="mr-2" />
-                            Supprimer
-                        </button>
-                    )} */}
                 </div>
             </div>
 
-            {/* Contenu principal - 2 colonnes */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Colonne gauche (2/3) - Info document */}
-                <div className="lg:col-span-2 space-y-6">
-                    <DocumentInfo document={document} />
+            {/* Contenu principal - 2 colonnes comme Google Drive */}
+            <div
+                className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+                style={{ height: "calc(100vh - 200px)" }}
+            >
+                {/* Colonne gauche (8/12) - APERÇU DU DOCUMENT (plus grand) */}
+                <div className="lg:col-span-8 h-full">
+                    <DocumentPreview document={document} />
                 </div>
 
-                {/* Colonne droite (1/3) - Catégorie, tags et historique */}
-                <div className="space-y-6">
+                {/* Colonne droite (4/12) - INFORMATIONS (plus étroit) */}
+                <div className="lg:col-span-4 h-full overflow-y-auto pr-2 space-y-6">
+                    <DocumentInfo document={document} />
                     <DocumentTags document={document} />
-
-                    {/* Historique (admin seulement) */}
-                    {/* <DocumentHistory
-                        document={document}
-                        canViewHistory={isAdmin}
-                    /> */}
                     <DocumentHistory document={document} />
                 </div>
             </div>

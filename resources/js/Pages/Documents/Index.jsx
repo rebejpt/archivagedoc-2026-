@@ -3,6 +3,7 @@ import { Link, usePage } from "@inertiajs/react";
 import FloeLayout from "@/Layouts/FloeLayout";
 import { usePermissions } from "@/Hooks/usePermissions";
 import axios from "@/Services/axios";
+import DocumentViewers from "./Partials/DocumentViewers";
 import {
     FileText,
     Download,
@@ -48,6 +49,11 @@ export default function DocumentsIndex() {
         sort_by: "created_at",
         sort_order: "desc",
     });
+
+    // State for viewers modal
+    const [showViewersModal, setShowViewersModal] = useState(false);
+    const [showDownloadsModal, setShowDownloadsModal] = useState(false);
+    const [selectedDocumentId, setSelectedDocumentId] = useState(null);
 
     useEffect(() => {
         fetchCategories();
@@ -721,13 +727,27 @@ export default function DocumentsIndex() {
                             )}
 
                             <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 border-t dark:border-gray-700 pt-3">
-                                <div className="flex items-center">
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setSelectedDocumentId(doc.id);
+                                        setShowViewersModal(true);
+                                    }}
+                                    className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                                    title="Voir les consultations"
+                                >
                                     <Eye size={14} className="mr-1" />
                                     <span>{doc.view_count || 0}</span>
-                                </div>
+                                </button>
                                 <div className="flex items-center">
                                     <Download size={14} className="mr-1" />
-                                    <span>{doc.download_count || 0}</span>
+                                    <button
+                                        
+                                        className="hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                                        
+                                    >
+                                        {doc.download_count || 0}
+                                    </button>
                                 </div>
                                 <button
                                     onClick={() => handleDownload(doc.id)}
@@ -799,18 +819,38 @@ export default function DocumentsIndex() {
                                     {formatFileSize(doc.file_size)}
                                 </div>
                                 <div className="col-span-1 text-sm text-gray-600 dark:text-gray-300 flex items-center">
-                                    <Eye
-                                        size={14}
-                                        className="mr-1 text-gray-400"
-                                    />
-                                    {doc.view_count || 0}
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setSelectedDocumentId(doc.id);
+                                            setShowViewersModal(true);
+                                        }}
+                                        className="flex items-center hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                                        title="Voir les consultations"
+                                    >
+                                        <Eye
+                                            size={14}
+                                            className="mr-1 text-gray-400"
+                                        />
+                                        {doc.view_count || 0}
+                                    </button>
                                 </div>
                                 <div className="col-span-1 text-sm text-gray-600 dark:text-gray-300 flex items-center">
                                     <Download
                                         size={14}
                                         className="mr-1 text-gray-400"
                                     />
-                                    {doc.download_count || 0}
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setSelectedDocumentId(doc.id);
+                                            setShowDownloadsModal(true);
+                                        }}
+                                        className="hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                                        title="Voir les téléchargements"
+                                    >
+                                        {doc.download_count || 0}
+                                    </button>
                                 </div>
                                 <div className="col-span-2 text-sm text-gray-600 dark:text-gray-300 flex items-center">
                                     <Clock
@@ -934,6 +974,28 @@ export default function DocumentsIndex() {
                     </nav>
                 </div>
             )}
+
+            {/* Modal - Liste des viewers */}
+            <DocumentViewers
+                documentId={selectedDocumentId}
+                isOpen={showViewersModal}
+                onClose={() => {
+                    setShowViewersModal(false);
+                    setSelectedDocumentId(null);
+                }}
+                type="view"
+            />
+
+            {/* Modal - Liste des téléchargements */}
+            <DocumentViewers
+                documentId={selectedDocumentId}
+                isOpen={showDownloadsModal}
+                onClose={() => {
+                    setShowDownloadsModal(false);
+                    setSelectedDocumentId(null);
+                }}
+                type="download"
+            />
         </FloeLayout>
     );
 }

@@ -426,14 +426,7 @@ export default function ModernLayout({ children }) {
                                 >
                                     Mon profil
                                 </Link>
-                                {isAdmin && (
-                                    <Link
-                                        href="/settings"
-                                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                                    >
-                                        Paramètres
-                                    </Link>
-                                )}
+
                                 <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                                 <button
                                     onClick={handleLogout}

@@ -1,31 +1,26 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Api\AccessRequestController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\StatsController;
 use App\Http\Controllers\Api\TagController;
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Services\DocumentConverter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use PhpOffice\PhpWord\PhpWord;
+
 
 // Page d'accueil publique avec formulaire de demande
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
 
-// Route pour le formulaire de demande d'accès
-Route::post('/access-request', function (Request $request) {
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
-        'company' => 'required|string|max:255',
-        'reason' => 'required|string'
-    ]);
-    
-    return response()->json(['message' => 'Demande envoyée avec succès']);
-})->name('access.request');
+// Routes pour les demandes d'accès
+Route::post('/access-request', [AccessRequestController::class, 'store']);
 
 // Routes protégées par authentification
 Route::middleware(['auth'])->group(function () {
@@ -93,7 +88,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/users', function () {
             return Inertia::render('Users/Index');
         })->name('users.index');
-        
+         // NOUVELLE ROUTE POUR LES DEMANDES
+        Route::get('/access-requests', function () {
+            return Inertia::render('Admin/AccessRequest/Index');
+        })->name('access-requests.index');
         Route::get('/users/create', function () {
             return Inertia::render('Users/Create');
         })->name('users.create');
@@ -135,7 +133,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('settings');
 });
 
-// Routes API-like via web (protégées par session CSRF)
+// Routes API-like via web 
 Route::middleware(['auth'])->prefix('web-api')->name('api.')->group(function () {
     // Statistiques
     Route::get('/stats', [StatsController::class, 'index'])->name('stats.index');
@@ -150,7 +148,14 @@ Route::middleware(['auth'])->prefix('web-api')->name('api.')->group(function () 
         Route::get('/{document}/download', [DocumentController::class, 'download'])->name('download');
         Route::get('/{id}/edit', [DocumentController::class, 'edit'])->name('edit');
         Route::get('/{document}/history', [DocumentController::class, 'history']);
+        Route::get('/{document}/viewers', [DocumentController::class, 'viewers']);
+           // NOUVELLE ROUTE POUR L'APERÇU
+        Route::get('/{document}/preview', [DocumentController::class, 'preview'])->name('preview');
     });
+
+    
+
+    
     
     // Catégories
     Route::prefix('categories')->name('categories.')->group(function () {
@@ -181,6 +186,10 @@ Route::middleware(['auth'])->prefix('web-api')->name('api.')->group(function () 
         Route::delete('/{user}', [UserController::class, 'destroy']);
         Route::patch('/{user}/toggle-active', [UserController::class, 'toggleActive']);
         Route::patch('/roles', [UserController::class, 'roles']);
+        // pour approver l'acces a un nouveau user
+        Route::get('/access-requests', [AccessRequestController::class, 'index']);
+        Route::post('/access-requests/{id}/approve', [AccessRequestController::class, 'approve']);
+        Route::post('/access-requests/{id}/reject', [AccessRequestController::class, 'reject']);
     });
     
     // Route pour récupérer les rôles (GET)

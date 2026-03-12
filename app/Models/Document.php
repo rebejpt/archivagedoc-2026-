@@ -46,6 +46,24 @@ class Document extends Model
         return $this->belongsToMany(Tag::class);
     }
 
+    /**
+     * Get the views for this document.
+     */
+    public function views()
+    {
+        return $this->hasMany(DocumentView::class);
+    }
+
+    /**
+     * Get the users who viewed this document.
+     */
+    public function viewers()
+    {
+        return $this->belongsToMany(User::class, 'document_views')
+            ->withPivot('viewed_at', 'ip_address', 'user_agent')
+            ->orderBy('document_views.viewed_at', 'desc');
+    }
+
     public function getFileUrlAttribute()
     {
         return Storage::url($this->file_path);
