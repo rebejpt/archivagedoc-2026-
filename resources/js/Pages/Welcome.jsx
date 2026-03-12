@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link, router } from "@inertiajs/react";
+import axios from "@/Services/axios";
+import { useToast } from "@/Hooks/useToast";
 import {
     FileText,
     Shield,
@@ -70,14 +72,12 @@ export default function Welcome() {
         company: "",
         phone: "",
         reason: "",
-        department: "",
-        employees: "",
     });
+    const toast = useToast();
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState("pro");
 
     // Couleur principale : #1901E6
     const primaryColor = "#1901E6";
@@ -95,23 +95,57 @@ export default function Welcome() {
         setError("");
 
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-            setSubmitted(true);
-            setFormData({
-                name: "",
-                email: "",
-                company: "",
-                phone: "",
-                reason: "",
-                department: "",
-                employees: "",
+            // Appel à la route PUBLIQUE pour la demande d'accès
+            const response = await axios.post("/access-request", {
+                name: formData.name,
+                email: formData.email,
+                company: formData.company,
+                reason: formData.reason,
             });
+
+            if (response.data.success) {
+                setSubmitted(true);
+                toast.success("Demande envoyée avec succès !");
+                setFormData({
+                    name: "",
+                    email: "",
+                    company: "",
+                    phone: "",
+                    reason: "",
+                });
+            }
         } catch (error) {
-            setError("Une erreur est survenue. Veuillez réessayer.");
+            console.error("Erreur:", error);
+            const errorMessage =
+                error.response?.data?.message || "Une erreur est survenue";
+            setError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
     };
+
+    if (submitted) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center">
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <CheckCircle size={40} className="text-green-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                        Demande envoyée !
+                    </h2>
+                    <p className="text-gray-600 mb-6">
+                        Votre demande d'accès a été envoyée. Vous recevrez un
+                        email après validation par un administrateur.
+                    </p>
+                    <Link href="/" className="text-blue-600 hover:underline">
+                        Retour à l'accueil
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     const features = [
         {
@@ -165,126 +199,6 @@ export default function Welcome() {
         { value: "50TB", label: "Données sécurisées", icon: HardDrive },
     ];
 
-    const recentDocuments = [
-        {
-            title: "Contrat annuel 2024",
-            category: "Juridique",
-            date: "Aujourd'hui",
-            type: "PDF",
-        },
-        {
-            title: "Rapport financier Q1",
-            category: "Finance",
-            date: "Hier",
-            type: "XLSX",
-        },
-        {
-            title: "Plan architectural",
-            category: "Technique",
-            date: "Il y a 2 jours",
-            type: "DWG",
-        },
-    ];
-
-    const testimonials = [
-        {
-            name: "Sophie Martin",
-            role: "Directrice Juridique",
-            company: "Groupe BNP",
-            content:
-                "Archidoc a révolutionné notre gestion documentaire. Plus de 50 000 contrats archivés et accessibles en quelques secondes.",
-            rating: 5,
-        },
-        {
-            name: "Thomas Dubois",
-            role: "Responsable RH",
-            company: "L'Oréal",
-            content:
-                "La sécurité et la traçabilité des documents sont exceptionnelles. Un outil indispensable pour notre département RH.",
-            rating: 5,
-        },
-        {
-            name: "Marie Laurent",
-            role: "Architecte",
-            company: "Foster + Partners",
-            content:
-                "Gestion des plans et documents techniques simplifiée. La recherche par OCR est bluffante de précision.",
-            rating: 5,
-        },
-    ];
-
-    const pricingPlans = [
-        {
-            name: "Essentiel",
-            price: "29",
-            unit: "€/mois",
-            description: "Pour les petites équipes",
-            features: [
-                "Jusqu'à 10 utilisateurs",
-                "100 Go de stockage",
-                "Versionnage de documents",
-                "Recherche basique",
-                "Support email",
-            ],
-            color: "gray",
-            popular: false,
-        },
-        {
-            name: "Professionnel",
-            price: "79",
-            unit: "€/mois",
-            description: "Pour les entreprises en croissance",
-            features: [
-                "Jusqu'à 50 utilisateurs",
-                "1 To de stockage",
-                "OCR avancé",
-                "Recherche full-text",
-                "API accessible",
-                "Support prioritaire",
-                "Audit complet",
-            ],
-            color: "blue",
-            popular: true,
-        },
-        {
-            name: "Entreprise",
-            price: "Sur mesure",
-            description: "Pour les grandes organisations",
-            features: [
-                "Utilisateurs illimités",
-                "Stockage personnalisé",
-                "SSO intégration",
-                "SLA garantie 99.99%",
-                "Support dédié 24/7",
-                "Formation sur site",
-                "Hébergement sur mesure",
-            ],
-            color: "purple",
-            popular: false,
-        },
-    ];
-
-    const events = [
-        {
-            date: "15 NOV",
-            title: "Open House Day",
-            description: "Découvrez notre plateforme en direct",
-            color: "blue",
-        },
-        {
-            date: "5 DÉC",
-            title: "Application Workshop",
-            description: "Atelier pratique pour les équipes",
-            color: "purple",
-        },
-        {
-            date: "10 JAN",
-            title: "International Student Orientation",
-            description: "Session spéciale pour les nouveaux",
-            color: "green",
-        },
-    ];
-
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Navigation */}
@@ -307,34 +221,6 @@ export default function Welcome() {
                             </span>
                         </div>
 
-                        {/* Navigation desktop */}
-                        {/* <div className="hidden md:flex items-center space-x-8">
-                            <Link
-                                href="#features"
-                                className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                            >
-                                Fonctionnalités
-                            </Link>
-                            <Link
-                                href="#pricing"
-                                className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                            >
-                                Tarifs
-                            </Link>
-                            <Link
-                                href="#testimonials"
-                                className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                            >
-                                Témoignages
-                            </Link>
-                            <Link
-                                href="#events"
-                                className="text-gray-600 hover:text-blue-600 transition-colors font-medium"
-                            >
-                                Événements
-                            </Link>
-                        </div> */}
-
                         {/* Auth buttons */}
                         <div className="hidden md:flex items-center space-x-4">
                             <Link
@@ -350,7 +236,7 @@ export default function Welcome() {
                                 style={{ backgroundColor: primaryColor }}
                             >
                                 <UserCircle size={18} className="mr-2" />
-                                Demande d'acces
+                                Demande d'accès
                             </Link>
                         </div>
 
@@ -367,58 +253,11 @@ export default function Welcome() {
                         </button>
                     </div>
                 </div>
-
-                {/* Mobile menu */}
-                {/* {mobileMenuOpen && (
-                    <div className="md:hidden bg-white border-b border-gray-200 py-4">
-                        <div className="max-w-7xl mx-auto px-4 space-y-3">
-                            <Link
-                                href="#features"
-                                className="block py-2 text-gray-600 hover:text-blue-600"
-                            >
-                                Fonctionnalités
-                            </Link>
-                            <Link
-                                href="#pricing"
-                                className="block py-2 text-gray-600 hover:text-blue-600"
-                            >
-                                Tarifs
-                            </Link>
-                            <Link
-                                href="#testimonials"
-                                className="block py-2 text-gray-600 hover:text-blue-600"
-                            >
-                                Témoignages
-                            </Link>
-                            <Link
-                                href="#events"
-                                className="block py-2 text-gray-600 hover:text-blue-600"
-                            >
-                                Événements
-                            </Link>
-                            <div className="pt-4 border-t border-gray-200">
-                                <Link
-                                    href="/login"
-                                    className="block py-2 text-gray-600 hover:text-blue-600"
-                                >
-                                    Connexion
-                                </Link>
-                                <Link
-                                    href="#request"
-                                    className="block py-2 font-medium"
-                                    style={{ color: primaryColor }}
-                                >
-                                    Essai gratuit
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                )} */}
             </nav>
 
             {/* Hero Section */}
             <div className="relative pt-32 pb-20 px-4 overflow-hidden">
-                {/* Background décoratif avec la couleur primaire */}
+                {/* Background décoratif */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#1901e6] via-white to-purple-50"></div>
                 <div className="absolute inset-0 opacity-20">
                     <div
@@ -466,7 +305,7 @@ export default function Welcome() {
                                     className="px-8 py-4 text-white rounded-xl hover:shadow-lg transition-all duration-300 text-center font-semibold text-lg flex items-center justify-center group"
                                     style={{ backgroundColor: primaryColor }}
                                 >
-                                    Demande d'acces
+                                    Demande d'accès
                                     <ChevronRight
                                         size={20}
                                         className="ml-2 group-hover:translate-x-1 transition-transform"
@@ -619,167 +458,140 @@ export default function Welcome() {
                 id="request"
                 className="py-16"
                 style={{
-                    background: `linear-gradient(90deg, #ffffff, #9c92f5 , #4936ea)`,
-                    opacity: 20,
+                    background: `linear-gradient(135deg, #ffffff, #9c92f5, #4936ea)`,
                 }}
             >
                 <div className="max-w-4xl mx-auto px-4">
                     <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
                         <div className="text-center mb-8">
                             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                                Demander un acces
+                                Demander un accès
                             </h2>
                             <p className="text-xl text-gray-600">
                                 Remplissez ce formulaire pour demander la
-                                creation de votre compte pour avoir acces au
-                                systeme
+                                création de votre compte
                             </p>
                         </div>
 
-                        {submitted ? (
-                            <div className="text-center py-12">
-                                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
-                                    <CheckCircle
-                                        size={40}
-                                        className="text-green-600"
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            {error && (
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start">
+                                    <AlertCircle
+                                        size={20}
+                                        className="text-red-600 mr-3 flex-shrink-0 mt-0.5"
                                     />
+                                    <p className="text-red-700">{error}</p>
                                 </div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                                    Demande envoyée avec succès !
-                                </h3>
-                                <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                                    Notre équipe vous contactera dans les 24h
-                                    pour activer votre compte.
-                                </p>
-                                <button
-                                    onClick={() => setSubmitted(false)}
-                                    className="font-semibold hover:underline"
-                                    style={{ color: primaryColor }}
-                                >
-                                    Nouvelle demande
-                                </button>
-                            </div>
-                        ) : (
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                {error && (
-                                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start">
-                                        <AlertCircle
-                                            size={20}
-                                            className="text-red-600 mr-3 flex-shrink-0 mt-0.5"
-                                        />
-                                        <p className="text-red-700">{error}</p>
-                                    </div>
-                                )}
+                            )}
 
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Nom complet *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={formData.name}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
-                                            style={{
-                                                focusRingColor: primaryColor,
-                                            }}
-                                            placeholder="Entrer Votre Nom"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Email professionnel *
-                                        </label>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
-                                            style={{
-                                                focusRingColor: primaryColor,
-                                            }}
-                                            placeholder="nom@gmail.com"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Entreprise *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="company"
-                                            value={formData.company}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
-                                            style={{
-                                                focusRingColor: primaryColor,
-                                            }}
-                                            placeholder="Nom de l'entreprise"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Téléphone
-                                        </label>
-                                        <input
-                                            type="tel"
-                                            name="phone"
-                                            value={formData.phone}
-                                            onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
-                                            style={{
-                                                focusRingColor: primaryColor,
-                                            }}
-                                            placeholder="+257 XX XX XX XX"
-                                        />
-                                    </div>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Nom complet *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
+                                        style={{
+                                            focusRingColor: primaryColor,
+                                        }}
+                                        placeholder="Entrer votre nom"
+                                    />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Motif de la demande *
+                                        Email professionnel *
                                     </label>
-                                    <textarea
-                                        name="reason"
-                                        value={formData.reason}
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
                                         onChange={handleChange}
                                         required
-                                        rows="4"
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
-                                        style={{ focusRingColor: primaryColor }}
-                                        placeholder="Décrivez brièvement vos besoins..."
+                                        style={{
+                                            focusRingColor: primaryColor,
+                                        }}
+                                        placeholder="nom@entreprise.com"
                                     />
                                 </div>
 
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full px-6 py-4 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-semibold text-lg flex items-center justify-center disabled:opacity-50"
-                                    style={{ backgroundColor: primaryColor }}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
-                                            Envoi en cours...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Envoyer
-                                            <Send size={20} className="ml-2" />
-                                        </>
-                                    )}
-                                </button>
-                            </form>
-                        )}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Entreprise *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="company"
+                                        value={formData.company}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
+                                        style={{
+                                            focusRingColor: primaryColor,
+                                        }}
+                                        placeholder="Nom de l'entreprise"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Téléphone
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
+                                        style={{
+                                            focusRingColor: primaryColor,
+                                        }}
+                                        placeholder="+257 XX XX XX XX"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Motif de la demande *
+                                </label>
+                                <textarea
+                                    name="reason"
+                                    value={formData.reason}
+                                    onChange={handleChange}
+                                    required
+                                    rows="4"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent"
+                                    style={{ focusRingColor: primaryColor }}
+                                    placeholder="Décrivez brièvement vos besoins..."
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full px-6 py-4 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-semibold text-lg flex items-center justify-center disabled:opacity-50"
+                                style={{ backgroundColor: primaryColor }}
+                            >
+                                {loading ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                                        Envoi en cours...
+                                    </>
+                                ) : (
+                                    <>
+                                        Envoyer
+                                        <Send size={20} className="ml-2" />
+                                    </>
+                                )}
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -805,9 +617,8 @@ export default function Welcome() {
                                 </span>
                             </div>
                             <p className="text-gray-400 mb-4 max-w-md">
-                                Plateforme securisee de gestion documentaire
-                                pour entreprises, controle d'acces,
-                                classification et recherche avancee.
+                                Plateforme sécurisée de gestion documentaire
+                                pour entreprises
                             </p>
                             <div className="flex space-x-4">
                                 <Link
@@ -831,7 +642,6 @@ export default function Welcome() {
                             </div>
                         </div>
 
-                        {/* Liens rapides */}
                         <div>
                             <h4 className="font-semibold text-lg mb-4">
                                 Produit
@@ -845,21 +655,12 @@ export default function Welcome() {
                                         Fonctionnalités
                                     </Link>
                                 </li>
-
                                 <li>
                                     <Link
-                                        href="#security"
+                                        href="#"
                                         className="text-gray-400 hover:text-white transition-colors"
                                     >
                                         Sécurité
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href="#api"
-                                        className="text-gray-400 hover:text-white transition-colors"
-                                    >
-                                        API
                                     </Link>
                                 </li>
                             </ul>
@@ -878,7 +679,6 @@ export default function Welcome() {
                                         Documentation
                                     </Link>
                                 </li>
-
                                 <li>
                                     <Link
                                         href="#"
@@ -903,7 +703,6 @@ export default function Welcome() {
                                         Confidentialité
                                     </Link>
                                 </li>
-
                                 <li>
                                     <Link
                                         href="#"
@@ -912,24 +711,12 @@ export default function Welcome() {
                                         Mentions légales
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link
-                                        href="#"
-                                        className="text-gray-400 hover:text-white transition-colors"
-                                    >
-                                        RGPD
-                                    </Link>
-                                </li>
                             </ul>
                         </div>
                     </div>
 
-                    {/* Copyright */}
                     <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
                         <p>© 2026 Archidoc. Tous droits réservés.</p>
-                        <p className="mt-2">
-                            Solution d'archivage documentaire
-                        </p>
                     </div>
                 </div>
             </footer>
